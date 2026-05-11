@@ -218,7 +218,7 @@ export default function HomePage({ onNavigate }) {
           <div>
             <p style={{ fontSize: '11px', fontWeight: '700', color: C.accent, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>Institutional Trust for Homeowners</p>
             <h1 className="hero-title" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '52px', fontWeight: '700', lineHeight: '1.08', color: C.primary, marginBottom: '24px' }}>
-              Secure your property<br />with absolute<br />certainty.
+              Know your tenant<br />Before you rent<br />
             </h1>
             <p style={{ fontSize: '16px', color: C.textMuted, lineHeight: '1.7', marginBottom: '36px', maxWidth: '420px' }}>
               Comprehensive, government-compliant background checks and identity verification designed specifically for discerning landlords and property managers.
