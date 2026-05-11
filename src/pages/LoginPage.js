@@ -1,107 +1,177 @@
 import React, { useState } from 'react';
 
-export default function LoginPage({ onLogin, onNavigate }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+const navItems = [
+  { label: 'Dashboard', icon: 'dashboard', key: 'dashboard' },
+  { label: 'Assign Field Agent', icon: 'person_add', key: 'assign', hasArrow: true },
+  { label: 'Pending Cases', icon: 'pending_actions', key: 'pending' },
+  { label: 'Reassign Cases', icon: 'sync_alt', key: 'reassign' },
+  { label: 'Review Cases', icon: 'rate_review', key: 'review' },
+  { label: 'Completed Cases', icon: 'task_alt', key: 'completed' },
+];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email || !password) { setError('Please fill in all fields.'); return; }
-    onLogin(email);
+const statusCards = [
+  { label: 'PENDING', color: '#e06c00', bgColor: '#fff3e8' },
+  { label: 'REVIEW', color: '#005eb8', bgColor: '#e8f0fb' },
+  { label: 'REASSIGN', color: '#7b3fe4', bgColor: '#f0e8fc' },
+  { label: 'ASSIGNED', color: '#006b5e', bgColor: '#e8f5f3' },
+];
+
+function formatDate(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
+
+export default function DashboardPage({ user, onLogout, onNavigate }) {
+  const [activeNav, setActiveNav] = useState('dashboard');
+
+  const today = new Date();
+  const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
+
+  const [fromDate, setFromDate] = useState(formatDate(weekAgo));
+  const [toDate, setToDate] = useState(formatDate(today));
+
+  const sidebarStyle = {
+    width: '270px', minHeight: '100vh', background: '#f9faf5',
+    borderRight: '1px solid #e2e3df', display: 'flex', flexDirection: 'column',
+    position: 'fixed', top: 0, left: 0,
   };
 
-  const inputStyle = {
-    width: '100%', padding: '12px 12px 12px 44px',
-    border: '1px solid #c4c6cc', borderRadius: '4px',
-    fontSize: '16px', background: '#f3f4f0', color: '#1a1c1a',
-    outline: 'none', fontFamily: 'Inter, sans-serif',
+  const mainStyle = {
+    marginLeft: '270px', flex: 1, background: '#f9faf5', minHeight: '100vh',
+    fontFamily: 'Inter, sans-serif',
   };
 
   return (
-    <div style={{ background: '#f9faf5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Inter, sans-serif' }}>
-      <main style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-        {/* Back to Home */}
-        <button
-          onClick={() => onNavigate('home')}
-          style={{
-            alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px',
-            background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: '14px', fontWeight: '500', color: '#44474c',
-            marginBottom: '24px', padding: '0',
-            position: 'sticky', top: '20px', zIndex: 1,
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span>
-          Back to Home
-        </button>
-
-        {/* Brand */}
-        <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#000', display: 'block', marginBottom: '8px', fontVariationSettings: "'FILL' 1" }}>shield_lock</span>
-          <h1 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '32px', fontWeight: '600', color: '#000' }}>KnowYourTenant</h1>
-        </div>
-
-        {/* Card */}
-        <div style={{ width: '100%', background: '#fff', border: '1px solid #e2e3df', borderRadius: '12px', padding: '40px', boxShadow: '0 4px 20px rgba(13,27,42,0.03)' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '24px', fontWeight: '600', color: '#1a1c1a', marginBottom: '8px' }}>Secure Login</h2>
-            <p style={{ fontSize: '16px', color: '#44474c' }}>Access your verification dashboard</p>
-          </div>
-
-          {error && <div style={{ background: '#ffdad6', color: '#93000a', padding: '12px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>{error}</div>}
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Email */}
+    <div style={{ display: 'flex', fontFamily: 'Inter, sans-serif' }}>
+      {/* Sidebar */}
+      <aside style={sidebarStyle}>
+        {/* Logo */}
+        <div style={{ padding: '28px 24px 20px', borderBottom: '1px solid #e2e3df' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '28px', color: '#1a1c1a', fontVariationSettings: "'FILL' 1" }}>shield_lock</span>
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#44474c', marginBottom: '8px' }}>Email Address</label>
-              <div style={{ position: 'relative' }}>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(68,71,76,0.5)', fontSize: '20px', pointerEvents: 'none' }}>mail</span>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@property.com" style={inputStyle} required />
-              </div>
+              <p style={{ fontFamily: 'Manrope, sans-serif', fontWeight: '700', fontSize: '15px', color: '#1a1c1a', lineHeight: '1.2' }}>KNOW YOUR<br />TENANT</p>
+              <p style={{ fontSize: '10px', fontWeight: '600', color: '#74777d', letterSpacing: '0.08em', marginTop: '2px' }}>CRE MANAGEMENT</p>
             </div>
-
-            {/* Password */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontSize: '14px', fontWeight: '500', color: '#44474c' }}>Password</label>
-                <button type="button" style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '600', color: '#000', cursor: 'pointer' }}>Forgot Password?</button>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <span className="material-symbols-outlined" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(68,71,76,0.5)', fontSize: '20px', pointerEvents: 'none' }}>lock</span>
-                <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ ...inputStyle, paddingRight: '44px' }} required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#44474c', display: 'flex', alignItems: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '8px' }}>
-              <button type="submit" style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '16px', borderRadius: '4px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Login
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
-              </button>
-            </div>
-          </form>
-
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <p style={{ fontSize: '14px', color: '#44474c' }}>
-              New user?{' '}
-              <button onClick={() => onNavigate('signup')} style={{ background: 'none', border: 'none', color: '#000', fontWeight: '600', cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}>Create an account</button>
-            </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', fontWeight: '600', color: '#44474c' }}>© 2024 KnowYourTenant. Secure Verification Services.</p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '8px' }}>
-            {['Privacy Policy', 'Security Disclosure'].map(l => (
-              <a key={l} href="#" style={{ fontSize: '12px', fontWeight: '600', color: '#44474c', textDecoration: 'none' }}>{l}</a>
+        {/* Nav */}
+        <nav style={{ flex: 1, padding: '16px 12px' }}>
+          {/* Back to Home — top of nav */}
+          <button
+            onClick={() => onNavigate('home')}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+              padding: '12px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+              fontSize: '14px', fontWeight: '500', fontFamily: 'Inter, sans-serif',
+              background: 'transparent', color: '#44474c', marginBottom: '4px', textAlign: 'left',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#44474c' }}>home</span>
+            Home
+          </button>
+
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#e2e3df', margin: '8px 4px 12px' }} />
+
+          {navItems.map(item => (
+            <button
+              key={item.key}
+              onClick={() => setActiveNav(item.key)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+                padding: '12px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                fontSize: '14px', fontWeight: '500', fontFamily: 'Inter, sans-serif',
+                background: activeNav === item.key ? '#e8e8e4' : 'transparent',
+                color: '#1a1c1a', marginBottom: '4px', textAlign: 'left',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#1a1c1a' }}>{item.icon}</span>
+                {item.label}
+              </div>
+              {item.hasArrow && <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#74777d' }}>chevron_right</span>}
+            </button>
+          ))}
+        </nav>
+
+        {/* Location + User */}
+        <div style={{ padding: '12px' }}>
+          <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e3df', background: '#fff', cursor: 'pointer', fontSize: '14px', color: '#1a1c1a', fontFamily: 'Inter, sans-serif', marginBottom: '8px' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>location_on</span>
+            Location
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px', background: '#f3f4f0', borderRadius: '8px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e2e3df', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#44474c' }}>person</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#1a1c1a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'User'}</p>
+              <p style={{ fontSize: '12px', color: '#74777d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email || ''}</p>
+            </div>
+            <button onClick={onLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#74777d', display: 'flex', alignItems: 'center' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main style={mainStyle}>
+        {/* Top bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '28px 40px 20px', borderBottom: '1px solid #e2e3df', background: '#f9faf5' }}>
+          <h1 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '28px', fontWeight: '600', color: '#1a1c1a' }}>CRE Dashboard</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1px solid #e2e3df', borderRadius: '6px', padding: '8px 14px' }}>
+              <input
+                type="text"
+                value={fromDate}
+                onChange={e => setFromDate(e.target.value)}
+                style={{ border: 'none', outline: 'none', fontSize: '14px', color: '#1a1c1a', background: 'transparent', width: '90px', fontFamily: 'Inter, sans-serif' }}
+              />
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#44474c' }}>calendar_today</span>
+            </div>
+            <span style={{ fontSize: '14px', color: '#44474c' }}>to</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1px solid #e2e3df', borderRadius: '6px', padding: '8px 14px' }}>
+              <input
+                type="text"
+                value={toDate}
+                onChange={e => setToDate(e.target.value)}
+                style={{ border: 'none', outline: 'none', fontSize: '14px', color: '#1a1c1a', background: 'transparent', width: '90px', fontFamily: 'Inter, sans-serif' }}
+              />
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#44474c' }}>calendar_today</span>
+            </div>
+            <button style={{ background: '#0D1B2A', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              Apply
+            </button>
+          </div>
+        </div>
+
+        {/* Status Cards */}
+        <div style={{ padding: '32px 40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+            {statusCards.map(card => (
+              <div key={card.label} style={{ background: '#fff', border: '1px solid #e2e3df', borderRadius: '10px', padding: '24px 28px', boxShadow: '0 1px 4px rgba(13,27,42,0.04)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: card.color }} />
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#44474c', letterSpacing: '0.06em' }}>{card.label}</span>
+                </div>
+                <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: '48px', fontWeight: '700', color: '#1a1c1a', lineHeight: '1' }}>0</p>
+              </div>
             ))}
           </div>
+
+          {activeNav === 'dashboard' && (
+            <div style={{ marginTop: '48px', textAlign: 'center', color: '#74777d' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#c4c6cc', display: 'block', marginBottom: '12px' }}>inbox</span>
+              <p style={{ fontSize: '15px' }}>No cases found for the selected date range.</p>
+              <p style={{ fontSize: '13px', marginTop: '4px' }}>Adjust the date filter or check back later.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

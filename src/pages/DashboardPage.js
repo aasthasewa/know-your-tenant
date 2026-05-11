@@ -17,13 +17,13 @@ const statusCards = [
 ];
 
 function formatDate(d) {
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yyyy = d.getFullYear();
   return `${dd}-${mm}-${yyyy}`;
 }
 
-export default function DashboardPage({ user, onLogout }) {
+export default function DashboardPage({ user, onLogout, onNavigate }) {
   const [activeNav, setActiveNav] = useState('dashboard');
 
   const today = new Date();
@@ -60,6 +60,23 @@ export default function DashboardPage({ user, onLogout }) {
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: '16px 12px' }}>
+          {/* Back to Home — top of nav */}
+          <button
+            onClick={() => onNavigate('home')}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+              padding: '12px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+              fontSize: '14px', fontWeight: '500', fontFamily: 'Inter, sans-serif',
+              background: 'transparent', color: '#44474c', marginBottom: '4px', textAlign: 'left',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#44474c' }}>home</span>
+            Home
+          </button>
+
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#e2e3df', margin: '8px 4px 12px' }} />
+
           {navItems.map(item => (
             <button
               key={item.key}
@@ -82,13 +99,12 @@ export default function DashboardPage({ user, onLogout }) {
           ))}
         </nav>
 
-        {/* Location */}
+        {/* Location + User */}
         <div style={{ padding: '12px' }}>
           <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e3df', background: '#fff', cursor: 'pointer', fontSize: '14px', color: '#1a1c1a', fontFamily: 'Inter, sans-serif', marginBottom: '8px' }}>
             <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>location_on</span>
             Location
           </button>
-          {/* User */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px', background: '#f3f4f0', borderRadius: '8px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e2e3df', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#44474c' }}>person</span>
@@ -149,7 +165,6 @@ export default function DashboardPage({ user, onLogout }) {
             ))}
           </div>
 
-          {/* Empty state message */}
           {activeNav === 'dashboard' && (
             <div style={{ marginTop: '48px', textAlign: 'center', color: '#74777d' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#c4c6cc', display: 'block', marginBottom: '12px' }}>inbox</span>
